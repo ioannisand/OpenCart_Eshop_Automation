@@ -144,20 +144,15 @@ class OpenCartManager():
         time.sleep(1)
         password_ele.send_keys(Keys.ENTER)
 
-    def navigate_backend_to(self, menu_item_num, submenu_item_num):
+    def navigate_backend_to(self, menu_item_id, submenu_item_xpath=None):
         ''' Once logged in to the Opencart backend interface, navigates the driver
         the specified menu item and sub item'''
-        menu_item_elements = self.driver.find_elements_by_css_selector("#column-left #menu li")
-        menu_item_ele = menu_item_elements[menu_item_num].find_element_by_css_selector("a")
-
-        for menu_item in menu_item_elements:
-            print(menu_item.text)
+        menu_item_ele = self.driver.find_element_by_id(menu_item_id)
         menu_item_ele.click()
         time.sleep(1)
-        parent_item_ele = self.driver.find_elements_by_css_selector("#column-left #menu li ul")[menu_item_num]
-        list_of_subitems = parent_item_ele.find_elements_by_css_selector("ul li a")
-        submenu_item_ele = list_of_subitems[submenu_item_num]
-        submenu_item_ele.click()
+        if submenu_item_xpath != None:
+            submenu_item_ele = self.driver.find_element_by_xpath(submenu_item_xpath)
+            submenu_item_ele.click()
 
     def decide_final_price(self, lowest_price_limit, current_price, PGECP_price_list, target_placement):
         ''' Returns the final decided price of the product, taking into consideration the lowest price limit, the
@@ -194,12 +189,15 @@ class OpenCartManager():
                 else:
                     continue
 
-    def open_new_tab_and_switch_focus(self, initial_url):
+    def open_new_tab_and_switch_focus(self, initial_url=os.getenv("PGECP_MAIN_PAGE_URL")):
         ''' Opens a new chrome tab using the self.driver and switches the focus to it, navigates to the specified url'''
-        self.driver.execute_script(f'''window.open({initial_url}, "_blank");''')
+        scriptstring = "window.open('" + initial_url + "');"
+        print(scriptstring)
+        self.driver.execute_script(scriptstring)
         self.driver.switch_to.window(self.driver.window_handles[-1])
+        self.driver.get(initial_url)
 
-    def close_tab_and_switch_focus_to_first(self, ):
+    def close_tab_and_switch_focus_to_first(self,):
         ''' Closes the current chrome tab of the self.driver and switches the focus to the first tab'''
         self.driver.close()
         self.driver.switch_to.window(self.driver.window_handles[0])
@@ -306,7 +304,7 @@ class OpenCartManager():
     def PGECP_get_search_results(self):
         ''' Using the self.driver, that should already be on the results page of the PGECP, gathers the names and links
         of all the resulting products and returns list of tuples containing tuples of size 2, name and link'''
-        product_card_eles = self.driver.find_elements_by_css_selector("#sku-list li .card-content a")
+        product_card_eles = self.driver.find_elements_by_css_selector("#sku-list li .card-content h2 a")
         product_list = []
         for product_card_ele in product_card_eles:
             product_name = product_card_ele.text
@@ -318,8 +316,8 @@ class OpenCartManager():
         ''' Provided the link the page of a product in the PGECP, sends out a request (using the python requests library
         and returns the data regarding that product (name, list of prices)'''
         response = requests.get(url=link).text
-        soup = BeautifulSoup(response)
-        PGECP_name = soup.select_one("#sku-details .sku-title .page-title")
+        soup = BeautifulSoup(response, "html.parser")
+        PGECP_name = soup.select_one("#sku-details .sku-title .page-title").text
         PGECP_price_elements_list = soup.select(".dominant-price")
         PGECP_prices = []
         for price in PGECP_price_elements_list:
@@ -353,7 +351,7 @@ class OpenCartManager():
 
     def PRODMAKE_begin_make_new(self):
         ''' Once on the products page of Opencart Backend Interface, begins the cration of the new product'''
-        make_new_product_button_ele = self.driver.find_element_by_css_selector\
+        make_new_product_button_ele = self.driver.find_elements_by_css_selector\
             (".page-header .container-fluid div a")[-1]
         make_new_product_button_ele.click()
 
