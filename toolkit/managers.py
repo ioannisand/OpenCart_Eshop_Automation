@@ -320,34 +320,13 @@ class OpenCartManager():
         PGECP_name = soup.select_one("#sku-details .sku-title .page-title").text
         PGECP_price_elements_list = soup.select(".dominant-price")
         PGECP_prices = []
+        PGECP_image_url = "https:" + soup.select_one(".section.content .image a img", href=True)['src']
         for price in PGECP_price_elements_list:
             price = float(price.text.replace(".", "", 1).replace(",", ".", 1).replace(" €", "", 1))
             PGECP_prices.append(price)
-        return {"PGECP_name": PGECP_name,"PGECP_pricelist": PGECP_prices}
+        return {"PGECP_name": PGECP_name,"PGECP_pricelist": PGECP_prices, "PGECP_image_url": PGECP_image_url}
 
-    def DEPRECATED_skip_manufacturer_updates(self, id, skip=0):
-        ''' Opens a new tab to edit the skip manufacturer updates element of the first result product of
-         opencart search result page'''
-        editbuttonele = self.driver.find_element_by_id(f"edit-{id}")
-        href = editbuttonele.get_attribute("href")
-        self.driver.execute_script("window.open('','_blank');")
-        self.driver.switch_to.window(self.driver.window_handles[1])
-        self.driver.get(href)
-        time.sleep(0.2)
-        data_tab_ele = self.driver.find_elements_by_css_selector(".nav.nav-tabs li a")[1]
-        data_tab_ele.click()
-        time.sleep(0.2)
 
-        skip_batch_ele = self.driver.find_element_by_id("input-skip-batch")
-        skip_batch_ele.click()
-        time.sleep(0.2)
-        skip_batch_YES_ele = skip_batch_ele.find_elements_by_css_selector("option")[skip]
-        skip_batch_YES_ele.click()
-        save_ele = self.driver.find_element_by_css_selector(".btn.btn-primary")
-        save_ele.click()
-        time.sleep(2.5)
-        self.driver.close()
-        self.driver.switch_to.window(self.driver.window_handles[0])
 
     def PRODMAKE_begin_make_new(self):
         ''' Once on the products page of Opencart Backend Interface, begins the cration of the new product'''
@@ -362,9 +341,14 @@ class OpenCartManager():
         tab_of_choice_ele.click()
 
     def PRODMAKE_insert_datum(self, input_element_id, datum):
-        ''' Once the opencart product creation page, in the general tab,'''
+        ''' On the opencart product creation page, in the general or data tab, inserts given data in the
+        specified input element of the page(specified by id)'''
         input_ele = self.driver.find_element_by_id(input_element_id)
         input_ele.send_keys(datum)
+
+    def PRODMAKE_select_datum(self, select_element_id, datum_index):
+        ''' Once the opencart data tab, selects the appropriate option(given by index) of the specified select field
+        element(specified by id)'''
 
     def get_image_from_address(self, image_address, storage_path, imagename):
         ''' Given the image adddress of a product, download it and store it in the specified path'''
