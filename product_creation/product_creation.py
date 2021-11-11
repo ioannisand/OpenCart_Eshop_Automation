@@ -9,13 +9,19 @@ FILENAME = input("Insert filename:")
 
 
 
-CATALOG_ID = "menu-catalog"
-PRODUCTS_XPATH = '//*[@id="collapse2"]/li[3]/a'
-PGECP_CHARACTERISTICS_CSS_SELECTOR = ".navigation-bar.list-controls.js-onpage-nav ul li a"
-MODEL_DATA_ID
-SKU_DATA_ID
-EAN_DATA_ID
-
+CATALOG_ELEMENT_ID = "menu-catalog"
+PRODUCTS_ELEMENT_XPATH = '//*[@id="collapse2"]/li[3]/a'
+PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR = ".navigation-bar.list-controls.js-onpage-nav ul li a"
+MODEL_DATA_ELEMENT_ID =
+SKU_DATA_ELEMENT_ID =
+EAN_DATA_ELEMENT_ID =
+ISBN_DATA_ELEMENT_ID =
+PRICE_DATA_ELEMENT_ID =
+TAX_CLASS_DATA_ELEMENT_ID =
+QUANTITY_DATA_ELEMENT_ID
+SKIP_BATCH_ELEMENT_ID
+DAYS_TO_DELIVERY_ELEMENT_ID
+WEIGHT_ELEMENT_ID
 
 
 # Import dataset, must be xlsx file with the following columns ['code', 'product', 'plafon']
@@ -41,6 +47,10 @@ for index, row in df_for_creation.iterrows():
     # Initialize product creation
     opencart_manager.PRODMAKE_begin_make_new()
     time.sleep(random.uniform(5, 10))
+
+
+    # product_data_to_insert
+
 
     # fill new product data
     opencart_manager.PRODMAKE_insert_datum()
@@ -84,18 +94,3 @@ for index, row in df_for_creation.iterrows():
 
 
         a = input("pause to see")
-
-
-
-    # fill general data
-    opencart_manager.PRODMAKE_insert_datum()
-    opencart_manager.PRODMAKE_insert_datum()
-
-
-    # decide price
-    opencart_manager.decide_final_price()
-
-    # fill data
-    opencart_manager.PRODMAKE_insert_datum()
-
-    # fill data

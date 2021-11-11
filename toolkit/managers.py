@@ -113,20 +113,19 @@ class OpenCartManager():
     options.add_experimental_option('useAutomationExtension', False)
     options.add_experimental_option("prefs", prefs)
 
-    def __init__(self):
+    def __init__(self,
+                 chromedriver_path,
+                 username,
+                 password,
+                 login_url,
+                 image_filepath
+                 ):
         self.driver = Chrome(executable_path=os.getenv("CHROMEDRIVER_PATH"), options=self.options)
         self.username = os.getenv("USERNAMEE")
         self.password = os.getenv("PASSWORD")
         self.login_url = os.getenv("LOGIN_URL")
         self.driver.maximize_window()
-        self.error_occured = []
-        self.one_res_different_prod = []
-        self.not_found = []
-        self.de_activate_multiple_results = []
-        self.de_activated_reports = []
-        self.update_multiple_results = []
-        self.update_reports = []
-        self.mismatches = []
+
 
 
     def get_logged_in(self):
@@ -340,6 +339,7 @@ class OpenCartManager():
         tab_of_choice_ele = self.driver.find_element_by_css_selector(".nav.nav-tabs li a")[tab_index]
         tab_of_choice_ele.click()
 
+
     def PRODMAKE_insert_datum(self, input_element_id, datum):
         ''' On the opencart product creation page, in the general or data tab, inserts given data in the
         specified input element of the page(specified by id)'''
@@ -349,6 +349,8 @@ class OpenCartManager():
     def PRODMAKE_select_datum(self, select_element_id, datum_index):
         ''' Once the opencart data tab, selects the appropriate option(given by index) of the specified select field
         element(specified by id)'''
+
+
 
     def get_image_from_address(self, image_address, storage_path, imagename):
         ''' Given the image adddress of a product, download it and store it in the specified path'''
