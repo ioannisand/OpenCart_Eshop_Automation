@@ -1,7 +1,8 @@
+import random
 import shutil
 
 from selenium.webdriver import ChromeOptions, Chrome
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import requests
@@ -151,6 +152,7 @@ class OpenCartManager():
         time.sleep(1)
         if submenu_item_xpath != None:
             submenu_item_ele = self.driver.find_element_by_xpath(submenu_item_xpath)
+            print(f"got exeuted, text is {submenu_item_ele.text}")
             submenu_item_ele.click()
 
     def decide_final_price(self, lowest_price_limit, current_price, PGECP_price_list, target_placement):
@@ -188,7 +190,7 @@ class OpenCartManager():
                 else:
                     continue
 
-    def open_new_tab_and_switch_focus(self, initial_url=os.getenv("PGECP_MAIN_PAGE_URL")):
+    def open_new_tab_and_switch_focus(self, initial_url):
         ''' Opens a new chrome tab using the self.driver and switches the focus to it, navigates to the specified url'''
         scriptstring = "window.open('" + initial_url + "');"
         print(scriptstring)
@@ -294,10 +296,11 @@ class OpenCartManager():
         search_ele.send_keys(Keys.CONTROL + "a")
         search_ele.send_keys(Keys.BACKSPACE)
         search_ele.send_keys(query + Keys.ENTER)
+        time.sleep(random.uniform(1,3))
         try:
             gamimena_cookies_ele = self.driver.find_element_by_id("accept-essential")
             gamimena_cookies_ele.click()
-        except NoSuchElementException:
+        except (NoSuchElementException, ElementClickInterceptedException):
             pass
 
     def PGECP_get_search_results(self):
@@ -336,7 +339,7 @@ class OpenCartManager():
     def PRODMAKE_select_tab(self, tab_index):
         ''' Once on the product creation page, clicks on the tab of product creation that corresponds to the
         index given'''
-        tab_of_choice_ele = self.driver.find_element_by_css_selector(".nav.nav-tabs li a")[tab_index]
+        tab_of_choice_ele = self.driver.find_elements_by_css_selector(".nav.nav-tabs li a")[tab_index]
         tab_of_choice_ele.click()
 
 
@@ -359,6 +362,7 @@ class OpenCartManager():
         filepath = f"{storage_path}/{imagename}.jpeg"
         with open(filepath, "wb") as file:
             shutil.copyfileobj(response.raw, file)
+
 
 
 

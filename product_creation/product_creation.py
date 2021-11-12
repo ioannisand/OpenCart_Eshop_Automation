@@ -1,43 +1,65 @@
 from toolkit.managers import OpenCartManager
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 import requests
 import pandas as pd
 import selenium as sel
 import time
 import random
+import os
+from dotenv import load_dotenv
+import datetime
 
-FILENAME = input("Insert filename:")
+load_dotenv()
 
-
-
-CATALOG_ELEMENT_ID = "menu-catalog"
+# IMPORTING PARAMETERS FROM ENVIRONMENT AND INITIALIZING AUTOMATED ONES
+FILENAME = input("insert filename: ")
+MANUFACTURER = input("insert manufacturer name:  ")
+DAY = datetime.datetime.now().strftime("%d")
+MONTH = datetime.datetime.now().strftime("%m")
+YEAR = 21
+POSOSTO = 1.06
+USERNAME = os.getenv("USERNAMEE")
+PASSWORD = os.getenv("PASSWORD")
+LOGIN_URL = os.getenv("LOGIN_URL")
+CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
+PHOTOS_FILEPATH = os.getenv("PHOTOS_FILEPATH")
+CATALOG_ELEMENT_ID = os.getenv("CATALOG_ELEMENT_ID")
 PRODUCTS_ELEMENT_XPATH = '//*[@id="collapse2"]/li[3]/a'
-PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR = ".navigation-bar.list-controls.js-onpage-nav ul li a"
-MODEL_DATA_ELEMENT_ID =
-SKU_DATA_ELEMENT_ID =
-EAN_DATA_ELEMENT_ID =
-ISBN_DATA_ELEMENT_ID =
-PRICE_DATA_ELEMENT_ID =
-TAX_CLASS_DATA_ELEMENT_ID =
-QUANTITY_DATA_ELEMENT_ID
-SKIP_BATCH_ELEMENT_ID
-DAYS_TO_DELIVERY_ELEMENT_ID
-WEIGHT_ELEMENT_ID
-
+PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR = os.getenv("PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR")
+NAME_GENDATA_ELEMENT_ID = os.getenv("NAME_GENDATA_ELEMENT_ID")
+PAGENAME_GENDATA_ELEMENT_ID = os.getenv("PAGENAME_GENDATA_ELEMENT_ID")
+MODEL_DATA_ELEMENT_ID = os.getenv("MODEL_DATA_ELEMENT_ID")
+SKU_DATA_ELEMENT_ID = os.getenv("SKU_DATA_ELEMENT_ID")
+EAN_DATA_ELEMENT_ID = os.getenv("EAN_DATA_ELEMENT_ID")
+ISBN_DATA_ELEMENT_ID = os.getenv("ISBN_DATA_ELEMENT_ID")
+PRICE_DATA_ELEMENT_ID = os.getenv("PRICE_DATA_ELEMENT_ID")
+TAX_CLASS_DATA_ELEMENT_ID = os.getenv("TAX_CLASS_DATA_ELEMENT_ID")
+QUANTITY_DATA_ELEMENT_ID = os.getenv("QUANTITY_DATA_ELEMENT_ID")
+SKIP_BATCH_DATA_ELEMENT_ID = os.getenv("SKIP_BATCH_ELEMENT_ID")
+DAYS_TO_DELIVERY_DATA_ELEMENT_ID = os.getenv("DAYS_TO_DELIVERY_ELEMENT_ID")
+WEIGHT_ELEMENT_ID = os.getenv("WEIGHT_ELEMENT_ID")
+PGECP_MAIN_PAGE_URL = os.getenv("PGECP_MAIN_PAGE_URL")
+idno = 0
 
 # Import dataset, must be xlsx file with the following columns ['code', 'product', 'plafon']
 df_for_creation = pd.read_excel(FILENAME)
 
 
 # Initialize manager object
-opencart_manager = OpenCartManager()
+opencart_manager = OpenCartManager(chromedriver_path=CHROMEDRIVER_PATH,
+                                   username=USERNAME,
+                                   password=PASSWORD,
+                                   login_url=LOGIN_URL,
+                                   image_filepath=PHOTOS_FILEPATH)
 opencart_manager.get_logged_in()
 
 # Navigate to product creation
-opencart_manager.navigate_backend_to(menu_item_id=CATALOG_ID, submenu_item_xpath=PRODUCTS_XPATH)
+opencart_manager.navigate_backend_to(menu_item_id=CATALOG_ELEMENT_ID, submenu_item_xpath=PRODUCTS_ELEMENT_XPATH)
 time.sleep(random.uniform(5, 10))
 
 # Iterate over dataset of newprods
 for index, row in df_for_creation.iterrows():
+    idno += 1
     code = row["code"]
     product = row["product"]
     plafon = row["plafon"]
@@ -50,19 +72,52 @@ for index, row in df_for_creation.iterrows():
 
 
     # product_data_to_insert
-
+    name = product
+    model = f"MLN-OPB{DAY}{MONTH}{idno}"
+    sku = f"OPB{DAY}{MONTH}{idno}{MANUFACTURER}"
+    ean = code
+    isbn = os.getenv("ISBN_DATA")
+    price = (plafon * POSOSTO) / 1.24
+    tax_class_index = 1
+    quantity = os.getenv("QUANTITY_DATA")
+    skip_batch_index = 0
+    days_to_delivery_index = 1
+    weight = 1.5
 
     # fill new product data
-    opencart_manager.PRODMAKE_insert_datum()
-    opencart_manager.PRODMAKE_insert_datum()
-    opencart_manager.PRODMAKE_select_tab()
+    # insert page name
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=NAME_GENDATA_ELEMENT_ID, datum=product)
+    # insert meta name
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=PAGENAME_GENDATA_ELEMENT_ID, datum=product)
+    # change tab to data
+    opencart_manager.PRODMAKE_select_tab(1)
+    time.sleep(random.uniform(1,3))
+    # insert model
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=MODEL_DATA_ELEMENT_ID, datum=model)
+    # insert sku
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=SKU_DATA_ELEMENT_ID, datum=sku)
+    # insert ean
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=EAN_DATA_ELEMENT_ID, datum=ean)
+    # insert isbn
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=ISBN_DATA_ELEMENT_ID, datum=isbn)
+    # insert price
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=PRICE_DATA_ELEMENT_ID, datum=price)
+    # select tax class
+    opencart_manager.PRODMAKE_select_datum(select_element_id=TAX_CLASS_DATA_ELEMENT_ID, datum_index=tax_class_index)
+    # insert quantity
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=QUANTITY_DATA_ELEMENT_ID, datum=quantity)
+    # toggle skip batch ele
+    opencart_manager.PRODMAKE_select_datum(select_element_id=SKIP_BATCH_DATA_ELEMENT_ID, datum_index=skip_batch_index)
+    # select days to delivery class
+    opencart_manager.PRODMAKE_select_datum(select_element_id=DAYS_TO_DELIVERY_DATA_ELEMENT_ID, datum_index=days_to_delivery_index)
+    # insert weight
+    opencart_manager.PRODMAKE_insert_datum(input_element_id=WEIGHT_ELEMENT_ID, datum=weight)
+    # switch to gen tab
 
-    opencart_manager.PRODMAKE_insert_datum()
-    opencart_manager.PRODMAKE_insert_datum()
-    opencart_manager
+
 
     # Scrape PGECP for data
-    opencart_manager.open_new_tab_and_switch_focus()
+    opencart_manager.open_new_tab_and_switch_focus(initial_url=PGECP_MAIN_PAGE_URL)
     opencart_manager.PGECP_search_query(product)
     time.sleep(random.uniform(4, 6))
     list_of_results = opencart_manager.PGECP_get_search_results()
@@ -83,14 +138,28 @@ for index, row in df_for_creation.iterrows():
         intended_result_index = "KAPPA"
         print("None of the results matched the, continue search manually through the internet")
 
-    # branch for when to
+    # branch for when it matches one of the results....
     if intended_result_index in range(len(list_of_results)):
         intended_product_link = list_of_results[intended_result_index][1]
         product_data = opencart_manager.PGECP_get_result_product_data(intended_product_link)
+        image_address = product_data["PGECP_image_url"]
+        time.sleep(random.uniform(1,3))
         opencart_manager.driver.get(intended_product_link)
-        characteristics_ele = opencart_manager.driver.find_elements_by_css_selector(PGECP_CHARACTERISTICS_CSS_SELECTOR)[1]
+        # catch
+        try:
+            gamimena_cookies_ele = opencart_manager.driver.find_element_by_id("accept-essential")
+            gamimena_cookies_ele.click()
+        except (NoSuchElementException, ElementClickInterceptedException):
+            pass
+        characteristics_ele = opencart_manager.driver.find_elements_by_css_selector(PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR)[1]
         time.sleep(random.uniform(0,1))
         characteristics_ele.click()
+        opencart_manager.get_image_from_address(image_address=image_address, storage_path=PHOTOS_FILEPATH, imagename=sku)
+    # .... or when it doesn't
+    else:
+        opencart_manager.driver.close()
+        opencart_manager.driver.switch_to.window(opencart_manager.driver.window_handles[0])
 
-
-        a = input("pause to see")
+    opencart_manager.driver.switch_to.window(opencart_manager.driver.window_handles[0])
+    product_got_created_prompt = input("If the product was created successfully, leave only first tab open and press "
+                                       "any key to continue to next item")
