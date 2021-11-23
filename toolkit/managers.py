@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def lista_comparison(df_today, month_today, df_last_update, month_last_update, manufacturer):
+def lista_comparison(df_today, df_last_update):
     ''' Returns a dictionary of dataframes containing the products that were up during the last update of the
      manufacturer's stock, the products whose price changed since last update, all the common products between the two
      lists regardless of price and all the products existing only in the new list. The input is 2 files put in the same
