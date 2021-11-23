@@ -17,7 +17,7 @@ MANUFACTURER = input("insert manufacturer name:  ")
 DAY = datetime.datetime.now().strftime("%d")
 MONTH = datetime.datetime.now().strftime("%m")
 YEAR = 21
-POSOSTO = 1.06
+POSOSTO = 1.3392
 USERNAME = os.getenv("USERNAMEE")
 PASSWORD = os.getenv("PASSWORD")
 LOGIN_URL = os.getenv("LOGIN_URL")
@@ -39,10 +39,10 @@ SKIP_BATCH_DATA_ELEMENT_ID = os.getenv("SKIP_BATCH_ELEMENT_ID")
 DAYS_TO_DELIVERY_DATA_ELEMENT_ID = os.getenv("DAYS_TO_DELIVERY_ELEMENT_ID")
 WEIGHT_ELEMENT_ID = os.getenv("WEIGHT_ELEMENT_ID")
 PGECP_MAIN_PAGE_URL = os.getenv("PGECP_MAIN_PAGE_URL")
-idno = 0
+idno = int(input("insert the number codes start counting from:"))
 
 # Import dataset, must be xlsx file with the following columns ['code', 'product', 'plafon']
-df_for_creation = pd.read_excel(FILENAME)
+df_for_creation = pd.read_excel(FILENAME).iloc[:, :]
 
 
 # Initialize manager object
@@ -64,11 +64,11 @@ for index, row in df_for_creation.iterrows():
     product = row["product"]
     plafon = row["plafon"]
 
-    time.sleep(random.uniform(3, 4))
+    time.sleep(random.uniform(1, 2))
 
     # Initialize product creation
     opencart_manager.PRODMAKE_begin_make_new()
-    time.sleep(random.uniform(5, 10))
+    time.sleep(random.uniform(2, 5))
 
 
     # product_data_to_insert
@@ -77,11 +77,11 @@ for index, row in df_for_creation.iterrows():
     sku = f"OPB{DAY}{MONTH}{idno}{MANUFACTURER}"
     ean = code
     isbn = os.getenv("ISBN_DATA")
-    price = (plafon * POSOSTO) / 1.24
+    price = (plafon * POSOSTO)
     tax_class_index = 1
     quantity = os.getenv("QUANTITY_DATA")
     skip_batch_index = 0
-    days_to_delivery_index = 1
+    days_to_delivery_index = 0
     weight = 1.5
 
     # fill new product data
@@ -91,7 +91,7 @@ for index, row in df_for_creation.iterrows():
     opencart_manager.PRODMAKE_insert_datum(input_element_id=PAGENAME_GENDATA_ELEMENT_ID, datum=product)
     # change tab to data
     opencart_manager.PRODMAKE_select_tab(1)
-    time.sleep(random.uniform(1,3))
+    time.sleep(random.uniform(0.5, 1.5))
     # insert model
     opencart_manager.PRODMAKE_insert_datum(input_element_id=MODEL_DATA_ELEMENT_ID, datum=model)
     # insert sku
@@ -143,7 +143,7 @@ for index, row in df_for_creation.iterrows():
         intended_product_link = list_of_results[intended_result_index][1]
         product_data = opencart_manager.PGECP_get_result_product_data(intended_product_link)
         image_address = product_data["PGECP_image_url"]
-        time.sleep(random.uniform(1,3))
+        time.sleep(random.uniform(0.5, 1.5))
         opencart_manager.driver.get(intended_product_link)
         # catch
         try:
@@ -152,7 +152,7 @@ for index, row in df_for_creation.iterrows():
         except (NoSuchElementException, ElementClickInterceptedException):
             pass
         characteristics_ele = opencart_manager.driver.find_elements_by_css_selector(PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR)[1]
-        time.sleep(random.uniform(0,1))
+        time.sleep(random.uniform(0, 1))
         characteristics_ele.click()
         opencart_manager.get_image_from_address(image_address=image_address, storage_path=PHOTOS_FILEPATH, imagename=sku)
     # .... or when it doesn't
@@ -161,5 +161,6 @@ for index, row in df_for_creation.iterrows():
         opencart_manager.driver.switch_to.window(opencart_manager.driver.window_handles[0])
 
     opencart_manager.driver.switch_to.window(opencart_manager.driver.window_handles[0])
+    opencart_manager.PRODMAKE_select_tab(tab_index=0)
     product_got_created_prompt = input("If the product was created successfully, leave only first tab open and press "
                                        "any key to continue to next item")

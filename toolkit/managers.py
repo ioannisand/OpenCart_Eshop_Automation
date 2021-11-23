@@ -15,15 +15,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def lista_comparison(day_today, month_today, day_last_update, month_last_update, manufacturer):
+def lista_comparison(df_today, month_today, df_last_update, month_last_update, manufacturer):
     ''' Returns a dictionary of dataframes containing the products that were up during the last update of the
      manufacturer's stock, the products whose price changed since last update, all the common products between the two
      lists regardless of price and all the products existing only in the new list. The input is 2 files put in the same
      working directory as the script that calls this function, named
      "availability_{INSERT_DAY_OF_MONTH}_{INSERT_NR_OF_MONTH}_{INSERT_MANUFACTURER_NAME}.xlsx" '''
     # importing the data
-    df_last_update = pd.read_excel(f"availability_{day_last_update}_{month_last_update}_{manufacturer}.xlsx", dtype=str)
-    df_today = pd.read_excel(f"availability_{day_today}_{month_today}_{manufacturer}.xlsx", dtype=str)
+
     names_last_update = df_last_update.iloc[:, 1].values
     names_today = df_today.iloc[:, 1].values
 
@@ -119,12 +118,12 @@ class OpenCartManager():
                  username,
                  password,
                  login_url,
-                 image_filepath
+                 image_filepath=None
                  ):
         self.driver = Chrome(executable_path=os.getenv("CHROMEDRIVER_PATH"), options=self.options)
-        self.username = os.getenv("USERNAMEE")
-        self.password = os.getenv("PASSWORD")
-        self.login_url = os.getenv("LOGIN_URL")
+        self.username = username
+        self.password = password
+        self.login_url = login_url
         self.driver.maximize_window()
 
 
@@ -256,7 +255,7 @@ class OpenCartManager():
         targetted_td_element.click()
         time.sleep(1)
         text_input_ele = self.driver.find_element_by_css_selector(".editable-input .form-control.input-sm")
-        text_input_ele.send_keys(Keys.CONTROL +"a")
+        text_input_ele.send_keys(Keys.CONTROL + "a")
         text_input_ele.send_keys(Keys.BACKSPACE)
         text_input_ele.send_keys(new_value)
         confirm_update_ele = \
@@ -296,7 +295,7 @@ class OpenCartManager():
         search_ele.send_keys(Keys.CONTROL + "a")
         search_ele.send_keys(Keys.BACKSPACE)
         search_ele.send_keys(query + Keys.ENTER)
-        time.sleep(random.uniform(1,3))
+        time.sleep(random.uniform(1, 3))
         try:
             gamimena_cookies_ele = self.driver.find_element_by_id("accept-essential")
             gamimena_cookies_ele.click()
@@ -326,7 +325,7 @@ class OpenCartManager():
         for price in PGECP_price_elements_list:
             price = float(price.text.replace(".", "", 1).replace(",", ".", 1).replace(" €", "", 1))
             PGECP_prices.append(price)
-        return {"PGECP_name": PGECP_name,"PGECP_pricelist": PGECP_prices, "PGECP_image_url": PGECP_image_url}
+        return {"PGECP_name": PGECP_name, "PGECP_pricelist": PGECP_prices, "PGECP_image_url": PGECP_image_url}
 
 
 
@@ -347,11 +346,17 @@ class OpenCartManager():
         ''' On the opencart product creation page, in the general or data tab, inserts given data in the
         specified input element of the page(specified by id)'''
         input_ele = self.driver.find_element_by_id(input_element_id)
+        input_ele.send_keys(Keys.CONTROL + "a")
+        input_ele.send_keys(Keys.BACKSPACE)
         input_ele.send_keys(datum)
 
     def PRODMAKE_select_datum(self, select_element_id, datum_index):
         ''' Once the opencart data tab, selects the appropriate option(given by index) of the specified select field
-        element(specified by id)'''
+        element(specified by id) '''
+        select_ele = self.driver.find_element_by_id(select_element_id)
+        select_ele.click()
+        choice_ele = select_ele.find_elements_by_css_selector("option")[datum_index]
+        choice_ele.click()
 
 
 
@@ -385,7 +390,7 @@ class PGECPmanager():
         self.driver.maximize_window()
 
     def log_in(self):
-        ''' Logs in the PGECP eshop management interface'''
+        ''' Logs in the PGECP eshop management interface '''
         login_url = self.login_url
         username = self.username
         password = self.password
