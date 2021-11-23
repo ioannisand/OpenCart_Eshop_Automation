@@ -79,7 +79,7 @@ for index, row in comparison_results["df_deact"].iterrows():
         first_result_name = name_ele.text
         if product == first_result_name:
             # DEACTIVATE
-            activity_status_ele = opencart_manager.QE_target_field(element_identifier=QE_ACTIVITY_STATUS_CSS_SELECTOR)
+            activity_status_ele = opencart_manager.QE_target_field(row_index=0, element_identifier=QE_ACTIVITY_STATUS_CSS_SELECTOR)
             opencart_manager.QE_update_select_input_field_from_td_ele(targetted_td_ele=activity_status_ele, option_number=0)
             time.sleep(random.uniform(1.5, 2.5))
     elif res_count > 1:

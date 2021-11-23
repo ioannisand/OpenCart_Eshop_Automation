@@ -133,7 +133,6 @@ class OpenCartManager():
         login_url = self.login_url
         username = self.username
         password = self.password
-        print(f"getting {login_url}")
         self.driver.get(url=login_url)
         # logging in
         username_ele = self.driver.find_element_by_name("username")
@@ -151,7 +150,6 @@ class OpenCartManager():
         time.sleep(1)
         if submenu_item_xpath != None:
             submenu_item_ele = self.driver.find_element_by_xpath(submenu_item_xpath)
-            print(f"got exeuted, text is {submenu_item_ele.text}")
             submenu_item_ele.click()
 
     def decide_final_price(self, lowest_price_limit, current_price, PGECP_price_list, target_placement):
@@ -270,8 +268,12 @@ class OpenCartManager():
         select_input_ele.click()
         option_ele = select_input_ele.find_elements_by_css_selector("option")[option_number]
         option_ele.click()
+        print("option was selected")
+        time.sleep(2)
         confirm_update_ele = \
-        self.driver.find_elements_by_css_selector(".control-group.form-group div .editable-buttons")[-1]
+        self.driver.find_elements_by_css_selector(".control-group.form-group div .btn.btn-primary.btn-sm.editable-submit")[-1]
+        time.sleep(2)
+        print(confirm_update_ele.text)
         confirm_update_ele.click()
 
     def QE_get_frontend_price_from_view(self, targetted_element):
