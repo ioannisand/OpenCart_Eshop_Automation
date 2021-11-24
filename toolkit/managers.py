@@ -257,7 +257,7 @@ class OpenCartManager():
         text_input_ele.send_keys(Keys.BACKSPACE)
         text_input_ele.send_keys(new_value)
         confirm_update_ele = \
-        self.driver.find_elements_by_css_selector(".control-group.form-group div .editable-buttons")[-1]
+        self.driver.find_elements_by_css_selector(".control-group.form-group div .btn.btn-primary.btn-sm.editable-submit")[-1]
         confirm_update_ele.click()
 
     def QE_update_select_input_field_from_td_ele(self, targetted_td_ele, option_number):
@@ -268,12 +268,10 @@ class OpenCartManager():
         select_input_ele.click()
         option_ele = select_input_ele.find_elements_by_css_selector("option")[option_number]
         option_ele.click()
-        print("option was selected")
         time.sleep(2)
         confirm_update_ele = \
         self.driver.find_elements_by_css_selector(".control-group.form-group div .btn.btn-primary.btn-sm.editable-submit")[-1]
         time.sleep(2)
-        print(confirm_update_ele.text)
         confirm_update_ele.click()
 
     def QE_get_frontend_price_from_view(self, targetted_element):
