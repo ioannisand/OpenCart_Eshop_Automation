@@ -5,6 +5,7 @@ import datetime
 import time
 import random
 from dotenv import load_dotenv
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 
 load_dotenv()
 
@@ -123,6 +124,17 @@ for index, row in df_common.iterrows():
                                                                           option_number=1)
                 time.sleep(2)
                 # Update Price
+                # Decide price
+                # print("deciding price")
+                # opencart_manager.open_new_tab_and_switch_focus()
+                #
+                # time.sleep(random.uniform(1,2))
+                # opencart_manager.PGECP_search_query(query=product)
+                # print("searched for it")
+                # list_of_results = opencart_manager.PGECP_get_search_results()
+                # link = list_of_results[0][1]
+                # pricelist = opencart_manager.PGECP_get_result_product_data()["PGECP_pricelist"]
+
                 new_price = str(plafon * 1.08)
                 price_ele = opencart_manager.QE_target_field(row_index=0, element_identifier=QE_PRICE_CSS_SELECTOR)
                 opencart_manager.QE_update_text_input_field_from_td_ele(targetted_td_element=price_ele, new_value=new_price)
@@ -143,4 +155,6 @@ df_creation = df_new.append(df_notfound)
 os.mkdir(f"REPORTS_{DAY}_{MONTH}_{MANUFACTURER}")
 df_deact.to_excel(f"REPORTS_{DAY}_{MONTH}_{MANUFACTURER}/deact_{DAY}_{MONTH}_{MANUFACTURER}.xlsx", index=False)
 df_multiple_results.to_excel(f"REPORTS_{DAY}_{MONTH}_{MANUFACTURER}/multres_{DAY}_{MONTH}_{MANUFACTURER}.xlsx", index=False)
-df_creation.to_excel(f"REPORTS_{DAY}_{MONTH}_{MANUFACTURER}/products_to_create_{DAY}_{MONTH}_{MANUFACTURER}.xlsx", index=False)
+df_creation.to_excel(f"REPORTS_{DAY}_{MONTH}_{MANUFACTURER}/products_to_cre"
+                     f"ate_{DAY}_{MONTH}_{MANUFACTURER}.xlsx", index=False)
+

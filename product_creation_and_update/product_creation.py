@@ -24,7 +24,7 @@ LOGIN_URL = os.getenv("LOGIN_URL")
 CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
 PHOTOS_FILEPATH = os.getenv("PHOTOS_FILEPATH")
 CATALOG_ELEMENT_ID = os.getenv("CATALOG_ELEMENT_ID")
-PRODUCTS_ELEMENT_XPATH = '//*[@id="collapse2"]/li[3]/a'
+PRODUCTS_ELEMENT_XPATH = '//*[@id="collapse2"]/li[2]/a'
 PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR = os.getenv("PGECP_CHARACTERISTICS_ELEMENT_CSS_SELECTOR")
 NAME_GENDATA_ELEMENT_ID = os.getenv("NAME_GENDATA_ELEMENT_ID")
 PAGENAME_GENDATA_ELEMENT_ID = os.getenv("PAGENAME_GENDATA_ELEMENT_ID")
@@ -35,8 +35,8 @@ ISBN_DATA_ELEMENT_ID = os.getenv("ISBN_DATA_ELEMENT_ID")
 PRICE_DATA_ELEMENT_ID = os.getenv("PRICE_DATA_ELEMENT_ID")
 TAX_CLASS_DATA_ELEMENT_ID = os.getenv("TAX_CLASS_DATA_ELEMENT_ID")
 QUANTITY_DATA_ELEMENT_ID = os.getenv("QUANTITY_DATA_ELEMENT_ID")
-SKIP_BATCH_DATA_ELEMENT_ID = os.getenv("SKIP_BATCH_ELEMENT_ID")
-DAYS_TO_DELIVERY_DATA_ELEMENT_ID = os.getenv("DAYS_TO_DELIVERY_ELEMENT_ID")
+SKIP_BATCH_DATA_ELEMENT_ID = os.getenv("SKIP_BATCH_DATA_ELEMENT_ID")
+DAYS_TO_DELIVERY_DATA_ELEMENT_ID = os.getenv("DAYS_TO_DELIVERY_DATA_ELEMENT_ID")
 WEIGHT_ELEMENT_ID = os.getenv("WEIGHT_ELEMENT_ID")
 PGECP_MAIN_PAGE_URL = os.getenv("PGECP_MAIN_PAGE_URL")
 idno = int(input("insert the number codes start counting from:"))
@@ -54,8 +54,9 @@ opencart_manager = OpenCartManager(chromedriver_path=CHROMEDRIVER_PATH,
 opencart_manager.get_logged_in()
 
 # Navigate to product creation
+time.sleep(1)
 opencart_manager.navigate_backend_to(menu_item_id=CATALOG_ELEMENT_ID, submenu_item_xpath=PRODUCTS_ELEMENT_XPATH)
-time.sleep(random.uniform(5, 10))
+time.sleep(random.uniform(2, 5))
 
 # Iterate over dataset of newprods
 for index, row in df_for_creation.iterrows():
@@ -68,18 +69,18 @@ for index, row in df_for_creation.iterrows():
 
     # Initialize product creation
     opencart_manager.PRODMAKE_begin_make_new()
-    time.sleep(random.uniform(2, 5))
+    time.sleep(random.uniform(1, 3))
 
 
     # product_data_to_insert
     name = product
-    model = f"MLN-OPB{DAY}{MONTH}{idno}"
+    model = f"GAT-OPB{DAY}{MONTH}{idno}"
     sku = f"OPB{DAY}{MONTH}{idno}{MANUFACTURER}"
     ean = code
     isbn = os.getenv("ISBN_DATA")
     price = (plafon * POSOSTO)
     tax_class_index = 1
-    quantity = os.getenv("QUANTITY_DATA")
+    quantity = 0
     skip_batch_index = 0
     days_to_delivery_index = 0
     weight = 1.5
@@ -99,7 +100,7 @@ for index, row in df_for_creation.iterrows():
     # insert ean
     opencart_manager.PRODMAKE_insert_datum(input_element_id=EAN_DATA_ELEMENT_ID, datum=ean)
     # insert isbn
-    opencart_manager.PRODMAKE_insert_datum(input_element_id=ISBN_DATA_ELEMENT_ID, datum=isbn)
+    # opencart_manager.PRODMAKE_insert_datum(input_element_id=ISBN_DATA_ELEMENT_ID, datum=isbn)
     # insert price
     opencart_manager.PRODMAKE_insert_datum(input_element_id=PRICE_DATA_ELEMENT_ID, datum=price)
     # select tax class
