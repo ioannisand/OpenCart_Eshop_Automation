@@ -17,7 +17,7 @@ MANUFACTURER = input("insert manufacturer name:  ")
 DAY = datetime.datetime.now().strftime("%d")
 MONTH = datetime.datetime.now().strftime("%m")
 YEAR = 21
-POSOSTO = 1.3144
+POSOSTO = 1.3125
 USERNAME = os.getenv("USERNAMEE")
 PASSWORD = os.getenv("PASSWORD")
 LOGIN_URL = os.getenv("LOGIN_URL")
@@ -74,8 +74,8 @@ for index, row in df_for_creation.iterrows():
 
     # product_data_to_insert
     name = product
-    model = f"GAT-OPB{DAY}{MONTH}{idno}"
-    sku = f"OPB{DAY}{MONTH}{idno}{MANUFACTURER}"
+    model = f"GAT-OGT{DAY}{MONTH}{idno}"
+    sku = f"OGT{DAY}{MONTH}{idno}{MANUFACTURER}"
     ean = code
     isbn = os.getenv("ISBN_DATA")
     price = (plafon * POSOSTO)
